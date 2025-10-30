@@ -1,27 +1,27 @@
-class InsufficientFunds(Exception):
-    pass
+from pokemon_service import PokemonService
+from pokemon_name_translator import PokemonNameTranslator
+from pokemon_report import PokemonReport
 
-class BankAccount:
-    def __init__(self, initial_balance=0):
-        self.balance = initial_balance
+def main():
+    # Initialize services
+    pokemon_service = PokemonService()
+    translator = PokemonNameTranslator()
+    report_generator = PokemonReport()
 
-    def deposit(self, amount):
-        if amount <= 0:
-            raise ValueError("Deposit amount must be positive")
-        self.balance += amount
+    # Get Pokemon information
+    pokemon_name = "pikachu"
+    pokemon_info = pokemon_service.get_pokemon_info(pokemon_name)
 
-    def withdraw(self, amount):
-        if amount <= 0:
-            raise ValueError("Withdrawal amount must be positive")
-        if amount > self.balance:
-            raise InsufficientFunds("Insufficient funds")
-        self.balance -= amount
+    if pokemon_info:
+        # Translate Pokemon name
+        translated_name = translator.translate(pokemon_name, target_language="fr")
 
-    def transfer(self, other_account, amount):
-        if not isinstance(other_account, BankAccount):
-            raise TypeError("Other account must be a BankAccount instance")
-        self.withdraw(amount)
-        other_account.deposit(amount)
+        # Generate and save PDF report
+        output_pdf = "pokemon_report.pdf"
+        report_generator.generate_report(pokemon_info, translated_name, output_pdf)
+        print(f"PDF report saved as {output_pdf}")
+    else:
+        print("Pokemon not found.")
 
-    def get_balance(self):
-        return self.balance
+if __name__ == "__main__":
+    main()
